@@ -97,6 +97,7 @@
       border: 1.5px solid var(--pine);
       background: #fff;
       color: var(--pine);
+      transition: background-color 0.15s ease;
     }
 
     .btn:hover {
@@ -118,10 +119,52 @@
       color: var(--muted);
     }
 
+    /* Inline Message Banner (replaces browser alert/confirm) */
+    .notice-banner {
+      display: none;
+      margin-top: 12px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: #fff5f5;
+      color: var(--berry);
+      border: 1px solid #f5c2c4;
+    }
+
+    .notice-banner.visible {
+      display: flex;
+    }
+
+    .notice-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .notice-btn {
+      padding: 5px 10px;
+      border-radius: 7px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid var(--berry);
+      background: var(--berry);
+      color: #fff;
+    }
+
+    .notice-btn.secondary {
+      background: #fff;
+      color: var(--text);
+      border-color: var(--border);
+    }
+
     /* 2. Calendars */
     .months-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 20px;
     }
 
@@ -166,6 +209,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
+      padding: 2px;
+      transition: all 0.12s ease;
     }
 
     .day-btn:hover {
@@ -260,6 +305,10 @@
         <button type="button" class="btn btn-danger" id="reset-all-btn">Reset All</button>
       </div>
       <p class="helper-text" id="status-text">Type your name above, then click all days you are free below.</p>
+      <div class="notice-banner" id="notice-banner">
+        <span id="notice-msg"></span>
+        <div class="notice-actions" id="notice-actions"></div>
+      </div>
     </div>
 
     <!-- 2. CALENDAR SELECTION -->
@@ -295,6 +344,47 @@
     const calendarsEl = document.getElementById("calendars");
     const resultsEl = document.getElementById("results");
     const totalPeopleEl = document.getElementById("total-people");
+    const noticeBanner = document.getElementById("notice-banner");
+    const noticeMsg = document.getElementById("notice-msg");
+    const noticeActions = document.getElementById("notice-actions");
+
+    function showNotice(message, confirmCallback = null) {
+      noticeMsg.textContent = message;
+      noticeActions.innerHTML = "";
+
+      if (confirmCallback) {
+        const yesBtn = document.createElement("button");
+        yesBtn.type = "button";
+        yesBtn.className = "notice-btn";
+        yesBtn.textContent = "Yes, Clear All";
+        yesBtn.onclick = () => {
+          hideNotice();
+          confirmCallback();
+        };
+
+        const cancelBtn = document.createElement("button");
+        cancelBtn.type = "button";
+        cancelBtn.className = "notice-btn secondary";
+        cancelBtn.textContent = "Cancel";
+        cancelBtn.onclick = hideNotice;
+
+        noticeActions.appendChild(yesBtn);
+        noticeActions.appendChild(cancelBtn);
+      } else {
+        const okBtn = document.createElement("button");
+        okBtn.type = "button";
+        okBtn.className = "notice-btn secondary";
+        okBtn.textContent = "Dismiss";
+        okBtn.onclick = hideNotice;
+        noticeActions.appendChild(okBtn);
+      }
+
+      noticeBanner.classList.add("visible");
+    }
+
+    function hideNotice() {
+      noticeBanner.classList.remove("visible");
+    }
 
     function save() {
       try {
@@ -308,6 +398,7 @@
     }
 
     nameInput.addEventListener("input", () => {
+      hideNotice();
       const key = currentKey();
       if (key && data[key]) {
         data[key].name = nameInput.value.trim();
@@ -317,27 +408,29 @@
     });
 
     document.getElementById("next-person-btn").addEventListener("click", () => {
+      hideNotice();
       nameInput.value = "";
       nameInput.focus();
       render();
     });
 
     document.getElementById("reset-all-btn").addEventListener("click", () => {
-      if (confirm("Clear all names and selected dates?")) {
+      showNotice("Clear all names and selected dates?", () => {
         data = {};
         nameInput.value = "";
         save();
         render();
-      }
+      });
     });
 
     function toggleDay(isoDate) {
       const rawName = nameInput.value.trim();
       if (!rawName) {
-        alert("Please enter your name at the top first.");
+        showNotice("Please enter your name in the box above first.");
         nameInput.focus();
         return;
       }
+      hideNotice();
       const key = rawName.toLowerCase();
       if (!data[key]) {
         data[key] = { name: rawName, dates: [] };
@@ -359,7 +452,7 @@
 
     function formatDate(iso) {
       const parts = iso.split("-");
-      const dt = new Date(Number(parts.at(0)), Number(parts.at(1)) - 1, Number(parts.at(2)));
+      const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
       return dt.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
     }
 
@@ -412,3 +505,77 @@
         }
 
         for (let day = 1; day <= m.days; day++) {
+          const mm = String(m.month + 1).padStart(2, "0");
+          const dd = String(day).padStart(2, "0");
+          const iso = `${m.year}-${mm}-${dd}`;
+
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "day-btn" + (myDates.includes(iso) ? " selected" : "");
+          btn.onclick = () => toggleDay(iso);
+
+          const numSpan = document.createElement("span");
+          numSpan.textContent = day;
+          btn.appendChild(numSpan);
+
+          const count = dateMap[iso] ? dateMap[iso].length : 0;
+          if (count > 0) {
+            const badge = document.createElement("span");
+            badge.className = "day-badge";
+            badge.textContent = `${count}✓`;
+            btn.appendChild(badge);
+          }
+
+          daysGrid.appendChild(btn);
+        }
+
+        box.appendChild(daysGrid);
+        calendarsEl.appendChild(box);
+      });
+
+      // Render Results
+      totalPeopleEl.textContent = `${activePeople.length} ${activePeople.length === 1 ? "person" : "people"} responded`;
+      resultsEl.innerHTML = "";
+
+      const entries = Object.entries(dateMap).sort((a, b) => {
+        if (b[1].length !== a[1].length) return b[1].length - a[1].length;
+        return a[0].localeCompare(b[0]);
+      });
+
+      if (entries.length === 0) {
+        resultsEl.innerHTML = `<p class="helper-text" style="margin:0;">No dates selected yet.</p>`;
+        return;
+      }
+
+      const maxCount = entries[0][1].length;
+
+      entries.forEach(([iso, names]) => {
+        const row = document.createElement("div");
+        row.className = "result-row" + (names.length === maxCount && maxCount > 1 ? " best" : "");
+
+        const left = document.createElement("div");
+        const dateSpan = document.createElement("span");
+        dateSpan.className = "date-label";
+        dateSpan.textContent = formatDate(iso);
+
+        const pill = document.createElement("span");
+        pill.className = "count-pill";
+        pill.textContent = `${names.length} free`;
+
+        left.appendChild(dateSpan);
+        left.appendChild(pill);
+
+        const right = document.createElement("div");
+        right.className = "names-list";
+        right.textContent = names.join(", ");
+
+        row.appendChild(left);
+        row.appendChild(right);
+        resultsEl.appendChild(row);
+      });
+    }
+
+    render();
+  </script>
+</body>
+</html>
