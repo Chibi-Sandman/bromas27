@@ -3,20 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Holiday Meetup Availability (Dec 2026 – Jan 2027)</title>
+  <title>Meetup Availability (Dec 2026 – Jan 2027)</title>
   <style>
     :root {
-      --pine: #133b2a;
-      --pine-dark: #0b2419;
+      --pine: #164230;
+      --pine-dark: #0d291e;
       --berry: #b8292f;
-      --berry-dark: #8f1d22;
-      --gold: #d4a338;
-      --cream: #fcfaf5;
+      --cream: #f8faf9;
       --card: #ffffff;
       --text: #1f2933;
-      --muted: #616e7c;
-      --border: #e4e7eb;
-      --selected-bg: #1b5e3f;
+      --muted: #52606d;
+      --border: #d9e2ec;
     }
 
     * { box-sizing: border-box; }
@@ -24,197 +21,122 @@
     body {
       margin: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-      background: radial-gradient(circle at top, #1b4d37 0%, var(--pine-dark) 100%);
+      background: var(--pine-dark);
       color: var(--text);
-      min-height: 100vh;
       padding: 24px 16px 48px;
     }
 
     .container {
-      max-width: 920px;
+      max-width: 880px;
       margin: 0 auto;
     }
 
     header {
       text-align: center;
       color: #fff;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
     }
 
     header h1 {
       margin: 0 0 6px;
-      font-size: 2rem;
-      letter-spacing: -0.02em;
+      font-size: 1.8rem;
     }
 
     header p {
       margin: 0;
       color: #d9e8e0;
-      font-size: 1rem;
     }
 
     .card {
       background: var(--card);
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-      border: 2px solid rgba(212, 163, 56, 0.45);
+      border-radius: 14px;
+      padding: 22px;
       margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     }
 
-    /* Top Name & Emoji Selector Bar */
-    .top-selector {
-      background: var(--cream);
-      border: 1.5px solid #d9e2ec;
-      border-radius: 12px;
-      padding: 16px;
-      margin-bottom: 22px;
-    }
-
-    .selector-row {
+    /* 1. Name Entry */
+    .name-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 16px;
+      gap: 12px;
       align-items: flex-end;
     }
 
-    .name-field {
-      flex: 1 1 220px;
-    }
-
-    .emoji-field {
-      flex: 2 1 340px;
+    .name-group {
+      flex: 1 1 260px;
     }
 
     label {
       display: block;
       font-weight: 700;
       margin-bottom: 6px;
-      font-size: 0.88rem;
       color: var(--pine);
+      font-size: 0.95rem;
     }
 
-    input[type="text"], textarea {
+    input[type="text"] {
       width: 100%;
-      padding: 10px 14px;
-      border: 1.5px solid #cbd2d9;
-      border-radius: 10px;
+      padding: 11px 14px;
       font-size: 1rem;
-      font-family: inherit;
-      background: #fff;
+      border: 2px solid var(--border);
+      border-radius: 10px;
     }
 
-    input[type="text"]:focus, textarea:focus {
+    input[type="text"]:focus {
       outline: none;
       border-color: var(--pine);
     }
 
-    .emoji-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .emoji-btn {
-      font-size: 1.35rem;
-      width: 40px;
-      height: 40px;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      background: #fff;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.1s, border-color 0.15s, background 0.15s;
-    }
-
-    .emoji-btn:hover {
-      transform: scale(1.08);
-    }
-
-    .emoji-btn.active {
-      border-color: var(--berry);
-      background: #fff0f0;
-      box-shadow: 0 0 0 2px rgba(184, 41, 47, 0.2);
-    }
-
-    .status-strip {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 10px;
-      margin-top: 14px;
-      padding-top: 12px;
-      border-top: 1px solid var(--border);
-    }
-
-    .active-user {
-      font-size: 0.98rem;
-      font-weight: 700;
-      color: var(--pine);
-    }
-
     .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 10px 16px;
-      border: none;
+      padding: 11px 16px;
       border-radius: 10px;
       font-size: 0.92rem;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s;
-    }
-
-    .btn-primary {
-      background: var(--berry);
-      color: #fff;
-      width: 100%;
-    }
-
-    .btn-primary:hover { background: var(--berry-dark); }
-
-    .btn-secondary {
-      background: var(--pine);
-      color: #fff;
-    }
-
-    .btn-secondary:hover { background: var(--pine-dark); }
-
-    .btn-outline {
+      border: 1.5px solid var(--pine);
       background: #fff;
       color: var(--pine);
-      border: 1.5px solid var(--pine);
-      padding: 6px 12px;
-      font-size: 0.84rem;
     }
 
-    .btn-outline:hover { background: #f0f7f4; }
+    .btn:hover {
+      background: #f0f7f4;
+    }
 
-    /* Calendars */
+    .btn-danger {
+      border-color: var(--berry);
+      color: var(--berry);
+    }
+
+    .btn-danger:hover {
+      background: #fff5f5;
+    }
+
+    .helper-text {
+      margin: 10px 0 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    /* 2. Calendars */
     .months-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 24px;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
     }
 
-    .month-card {
+    .month-box {
       background: var(--cream);
-      border: 1.5px solid #e2e8f0;
+      border: 1px solid var(--border);
       border-radius: 12px;
       padding: 16px;
     }
 
     .month-title {
       text-align: center;
-      font-weight: 700;
+      margin: 0 0 12px;
       font-size: 1.15rem;
       color: var(--berry);
-      margin: 0 0 12px;
     }
 
     .weekdays, .days {
@@ -233,114 +155,78 @@
 
     .day-btn {
       aspect-ratio: 1 / 1;
-      border: 1.5px solid #d9e2ec;
-      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
       background: #fff;
+      font-size: 0.95rem;
       font-weight: 600;
-      font-size: 0.92rem;
       color: var(--text);
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      transition: all 0.12s;
     }
 
     .day-btn:hover {
       border-color: var(--pine);
-      background: #f2f9f5;
     }
 
     .day-btn.selected {
-      background: var(--selected-bg);
-      border-color: var(--selected-bg);
+      background: var(--pine);
+      border-color: var(--pine);
       color: #fff;
     }
 
-    .day-count {
+    .day-badge {
       font-size: 0.68rem;
-      font-weight: 700;
       margin-top: 2px;
       color: var(--berry);
+      font-weight: 700;
     }
 
-    .day-btn.selected .day-count {
-      color: #ffe8a3;
+    .day-btn.selected .day-badge {
+      color: #ffd166;
     }
 
-    /* Share / Merge Section */
-    .share-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 18px;
-    }
-
-    .share-box {
-      background: var(--cream);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-    }
-
-    .share-box h3 {
-      margin: 0 0 6px;
-      font-size: 1rem;
-      color: var(--pine);
-    }
-
-    .share-box p {
-      margin: 0 0 10px;
-      font-size: 0.86rem;
-      color: var(--muted);
-    }
-
-    .code-output {
-      font-family: monospace;
-      font-size: 0.82rem;
-      height: 68px;
-      resize: none;
-      margin-bottom: 10px;
-    }
-
-    /* Aggregate List */
-    .agg-header {
+    /* 3. Results */
+    .results-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 14px;
     }
 
-    .agg-header h2 {
+    .results-header h2 {
       margin: 0;
-      font-size: 1.25rem;
+      font-size: 1.2rem;
       color: var(--pine);
     }
 
-    .agg-item {
+    .result-row {
       display: flex;
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       padding: 12px 14px;
-      border-radius: 10px;
       border: 1px solid var(--border);
+      border-radius: 10px;
       margin-bottom: 8px;
       background: var(--cream);
     }
 
-    .agg-item.top-pick {
-      border-color: var(--gold);
+    .result-row.best {
+      border-color: #d4a338;
       background: #fffbeb;
     }
 
-    .agg-date {
+    .date-label {
       font-weight: 700;
       color: var(--pine);
     }
 
-    .badge {
+    .count-pill {
       background: var(--berry);
       color: #fff;
       font-size: 0.78rem;
@@ -350,83 +236,179 @@
       margin-left: 8px;
     }
 
-    .people-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-    }
-
-    .person-pill {
-      background: #fff;
-      border: 1px solid #d9e2ec;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.85rem;
-      font-weight: 500;
-    }
-
-    .status-msg {
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: var(--pine);
-      margin-top: 8px;
+    .names-list {
+      font-size: 0.9rem;
+      color: var(--text);
     }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
-      <h1>🎄 Holiday Meetup Calendar</h1>
+      <h1>🎄 Meetup Availability Calendar</h1>
       <p>December 1, 2026 – January 31, 2027</p>
     </header>
 
-    <!-- SINGLE-PAGE CALENDAR SELECTOR WITH NAME INPUT AT TOP -->
+    <!-- 1. NAME ENTRY -->
     <div class="card">
-      <div class="top-selector">
-        <div class="selector-row">
-          <div class="name-field">
-            <label for="name-input">1. Enter Your Name</label>
-            <input type="text" id="name-input" placeholder="Type your name..." maxlength="30" />
-          </div>
-
-          <div class="emoji-field">
-            <label>2. Pick Your Holiday Icon</label>
-            <div class="emoji-grid" id="emoji-grid"></div>
-          </div>
+      <div class="name-row">
+        <div class="name-group">
+          <label for="person-name">Your Name</label>
+          <input type="text" id="person-name" placeholder="Enter your name..." maxlength="40" />
         </div>
-
-        <div class="status-strip">
-          <div class="active-user" id="current-user-label">Type your name above, then click your free days below</div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button class="btn btn-outline" id="new-person-btn">+ Add Another Person</button>
-            <button class="btn btn-outline" id="clear-my-days-btn">Clear My Days</button>
-          </div>
-        </div>
+        <button type="button" class="btn" id="next-person-btn">+ Next Person</button>
+        <button type="button" class="btn btn-danger" id="reset-all-btn">Reset All</button>
       </div>
-
-      <div class="months-grid" id="months-grid"></div>
+      <p class="helper-text" id="status-text">Type your name above, then click all days you are free below.</p>
     </div>
 
-    <!-- AGGREGATE RESULTS -->
+    <!-- 2. CALENDAR SELECTION -->
     <div class="card">
-      <div class="agg-header">
-        <h2>🎁 Best Days to Meet (Ranked by Availability)</h2>
-        <span id="participant-count" style="font-weight:600; color:var(--muted); font-size:0.9rem;"></span>
-      </div>
-      <div id="aggregate-list"></div>
+      <div class="months-grid" id="calendars"></div>
     </div>
 
-    <!-- EXPORT / IMPORT CODES -->
+    <!-- 3. RESULTS BELOW -->
     <div class="card">
-      <div class="share-grid">
-        <div class="share-box">
-          <h3>📤 Share Your Availability Code</h3>
-          <p>Copy your personal code below and send it to your group chat.</p>
-          <textarea id="export-code" class="code-output" readonly placeholder="Enter your name and pick at least one day to generate your code..."></textarea>
-          <button class="btn btn-secondary" id="copy-code-btn" style="width:100%;">Copy My Code</button>
-          <div id="copy-status" class="status-msg"></div>
-        </div>
+      <div class="results-header">
+        <h2>Best Days to Meet</h2>
+        <span id="total-people" style="font-size:0.9rem; color:var(--muted); font-weight:600;"></span>
+      </div>
+      <div id="results"></div>
+    </div>
+  </div>
 
-        <div class="share-box">
-          <h3>📥 Merge Friends' Codes</h3>
-          <p>Paste codes from your group (separated by spaces or new lines) to combine totals.</p>
+  <script>
+    const MONTHS = [
+      { year: 2026, month: 11, title: "December 2026", days: 31 },
+      { year: 2027, month: 0,  title: "January 2027",  days: 31 }
+    ];
+
+    let data = {};
+    try {
+      data = JSON.parse(localStorage.getItem("simple_meetup_2026") || "{}");
+    } catch (e) {
+      data = {};
+    }
+
+    const nameInput = document.getElementById("person-name");
+    const statusText = document.getElementById("status-text");
+    const calendarsEl = document.getElementById("calendars");
+    const resultsEl = document.getElementById("results");
+    const totalPeopleEl = document.getElementById("total-people");
+
+    function save() {
+      try {
+        localStorage.setItem("simple_meetup_2026", JSON.stringify(data));
+      } catch (e) {}
+    }
+
+    function currentKey() {
+      const raw = nameInput.value.trim();
+      return raw ? raw.toLowerCase() : "";
+    }
+
+    nameInput.addEventListener("input", () => {
+      const key = currentKey();
+      if (key && data[key]) {
+        data[key].name = nameInput.value.trim();
+        save();
+      }
+      render();
+    });
+
+    document.getElementById("next-person-btn").addEventListener("click", () => {
+      nameInput.value = "";
+      nameInput.focus();
+      render();
+    });
+
+    document.getElementById("reset-all-btn").addEventListener("click", () => {
+      if (confirm("Clear all names and selected dates?")) {
+        data = {};
+        nameInput.value = "";
+        save();
+        render();
+      }
+    });
+
+    function toggleDay(isoDate) {
+      const rawName = nameInput.value.trim();
+      if (!rawName) {
+        alert("Please enter your name at the top first.");
+        nameInput.focus();
+        return;
+      }
+      const key = rawName.toLowerCase();
+      if (!data[key]) {
+        data[key] = { name: rawName, dates: [] };
+      } else {
+        data[key].name = rawName;
+      }
+
+      const list = data[key].dates;
+      const idx = list.indexOf(isoDate);
+      if (idx === -1) {
+        list.push(isoDate);
+      } else {
+        list.splice(idx, 1);
+      }
+      list.sort();
+      save();
+      render();
+    }
+
+    function formatDate(iso) {
+      const parts = iso.split("-");
+      const dt = new Date(Number(parts.at(0)), Number(parts.at(1)) - 1, Number(parts.at(2)));
+      return dt.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
+    }
+
+    function render() {
+      const key = currentKey();
+      const myDates = (key && data[key]) ? data[key].dates : [];
+
+      if (key) {
+        statusText.textContent = `Selecting days for ${nameInput.value.trim()} (${myDates.length} selected)`;
+      } else {
+        statusText.textContent = "Type your name above, then click all days you are free below.";
+      }
+
+      // Build map of date -> list of names
+      const dateMap = {};
+      const activePeople = Object.values(data).filter(p => p.dates && p.dates.length > 0);
+      activePeople.forEach(person => {
+        person.dates.forEach(d => {
+          if (!dateMap[d]) dateMap[d] = [];
+          dateMap[d].push(person.name);
+        });
+      });
+
+      // Render Calendars
+      calendarsEl.innerHTML = "";
+      MONTHS.forEach(m => {
+        const box = document.createElement("div");
+        box.className = "month-box";
+
+        const heading = document.createElement("h3");
+        heading.className = "month-title";
+        heading.textContent = m.title;
+        box.appendChild(heading);
+
+        const wkRow = document.createElement("div");
+        wkRow.className = "weekdays";
+        ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach(w => {
+          const cell = document.createElement("div");
+          cell.textContent = w;
+          wkRow.appendChild(cell);
+        });
+        box.appendChild(wkRow);
+
+        const daysGrid = document.createElement("div");
+        daysGrid.className = "days";
+
+        const startWeekday = new Date(m.year, m.month, 1).getDay();
+        for (let i = 0; i < startWeekday; i++) {
+          daysGrid.appendChild(document.createElement("div"));
+        }
+
+        for (let day = 1; day <= m.days; day++) {
