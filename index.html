@@ -147,60 +147,8 @@
     .emoji-btn.active {
       border-color: var(--pine);
       background: #e6f2ed;
-      box-shadow: 0 0 0 2px rgba(22, 66, 48, 0.2);
+      box-shadow: 0 0 0 2px rgba(212, 163, 56, 0.45);
       transform: translateY(-1px);
-    }
-
-    /* Saved People Bar */
-    .saved-people-section {
-      display: none;
-      margin-top: 16px;
-      padding-top: 14px;
-      border-top: 1px solid var(--border);
-    }
-
-    .saved-people-section.visible {
-      display: block;
-    }
-
-    .saved-people-label {
-      font-size: 0.85rem;
-      font-weight: 700;
-      color: var(--muted);
-      margin-bottom: 8px;
-      display: block;
-    }
-
-    .saved-people-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .person-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 6px 12px;
-      border-radius: 999px;
-      border: 1.5px solid var(--border);
-      background: var(--cream);
-      color: var(--text);
-      font-size: 0.88rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.12s ease;
-    }
-
-    .person-pill:hover {
-      border-color: var(--pine);
-      background: #f0f7f4;
-    }
-
-    .person-pill.active {
-      background: var(--pine);
-      border-color: var(--pine);
-      color: #fff;
     }
 
     .helper-text {
@@ -309,7 +257,7 @@
 
     .day-btn.selected {
       background: var(--pine);
-      border-color: var(--pine);
+      border-color: #d4a338;
       color: #fff;
     }
 
@@ -376,6 +324,12 @@
   </style>
 </head>
 <body>
+  <div class="container">
+    <header>
+      <h1>🎄 Meetup Availability Calendar</h1>
+      <p>December 1, 2026 – January 31, 2027</p>
+    </header>
+
     <!-- 1. NAME ENTRY, EMOJI SELECTOR & SAVE -->
     <div class="card">
       <div class="name-row">
@@ -384,7 +338,6 @@
           <input type="text" id="person-name" placeholder="Enter your name..." maxlength="40" />
         </div>
         <button type="button" class="btn btn-primary" id="save-btn">Save Selections</button>
-        <button type="button" class="btn" id="next-person-btn">+ Next Person</button>
       </div>
 
       <div class="emoji-section">
@@ -392,15 +345,10 @@
         <div class="emoji-grid" id="emoji-grid"></div>
       </div>
 
-      <p class="helper-text" id="status-text">Type your name above, then click all days you are free below.</p>
+      <p class="helper-text" id="status-text">One submission per person — you can return anytime to update your dates.</p>
       <div class="notice-banner" id="notice-banner">
         <span id="notice-msg"></span>
         <div class="notice-actions" id="notice-actions"></div>
-      </div>
-
-      <div class="saved-people-section" id="saved-people-section">
-        <span class="saved-people-label">Saved People (Click to Edit)</span>
-        <div class="saved-people-list" id="saved-people-list"></div>
       </div>
     </div>
 
@@ -427,14 +375,38 @@
 
     const EMOJIS = ["🎄", "🎅", "⛄", "🦌", "🎁", "❄️", "🔔", "🍪", "✨", "🥂"];
 
-    let data = {};
-    try {
-      data = JSON.parse(localStorage.getItem("simple_meetup_2026") || "{}");
-    } catch (e) {
-      data = {};
-    }
+    // Enforce strictly ONE saved profile per browser/person
+    let profile = {
+      name: "",
+      emoji: EMOJIS[0],
+      dates: [],
+      hasSaved: false
+    };
 
-    let selectedEmoji = EMOJIS[0];
+    try {
+      const raw = JSON.parse(localStorage.getItem("simple_meetup_2026") || "null");
+      if (raw && typeof raw === "object") {
+        if (typeof raw.name === "string" && Array.isArray(raw.dates)) {
+          profile = {
+            name: raw.name,
+            emoji: raw.emoji || EMOJIS[0],
+            dates: raw.dates,
+            hasSaved: Boolean(raw.hasSaved)
+          };
+        } else {
+          // Migrate legacy multi-entry object into a single profile if present
+          const firstEntry = Object.values(raw).find(p => p && typeof p.name === "string");
+          if (firstEntry) {
+            profile = {
+              name: firstEntry.name,
+              emoji: firstEntry.emoji || EMOJIS[0],
+              dates: Array.isArray(firstEntry.dates) ? firstEntry.dates : [],
+              hasSaved: true
+            };
+          }
+        }
+      }
+    } catch (e) {}
 
     const nameInput = document.getElementById("person-name");
     const emojiGridEl = document.getElementById("emoji-grid");
@@ -445,14 +417,9 @@
     const noticeBanner = document.getElementById("notice-banner");
     const noticeMsg = document.getElementById("notice-msg");
     const noticeActions = document.getElementById("notice-actions");
-    const savedPeopleSection = document.getElementById("saved-people-section");
-    const savedPeopleList = document.getElementById("saved-people-list");
 
-    function getUnusedEmoji() {
-      const used = new Set(Object.values(data).map(p => p.emoji).filter(Boolean));
-      const available = EMOJIS.find(e => !used.has(e));
-      return available || EMOJIS[Object.keys(data).length % EMOJIS.length];
-    }
+    // Pre-populate saved profile fields on return visits
+    nameInput.value = profile.name;
 
     function showNotice(message, isSuccess = false) {
       noticeMsg.textContent = message;
@@ -475,26 +442,21 @@
 
     function persistStorage() {
       try {
-        localStorage.setItem("simple_meetup_2026", JSON.stringify(data));
+        localStorage.setItem("simple_meetup_2026", JSON.stringify(profile));
       } catch (e) {}
     }
 
-    function currentKey() {
-      const raw = nameInput.value.trim();
-      return raw ? raw.toLowerCase() : "";
-    }
-
-    // Automatically load existing saved person if user types a matching saved name
+    // Editing the name simply updates the single profile's display name
     nameInput.addEventListener("input", () => {
       hideNotice();
-      const key = currentKey();
-      if (key && data[key]) {
-        selectedEmoji = data[key].emoji || selectedEmoji;
+      profile.name = nameInput.value.trim();
+      if (profile.hasSaved) {
+        persistStorage();
       }
       render();
     });
 
-    // Explicit Save button
+    // Explicit Save button (locks in or updates the single profile)
     document.getElementById("save-btn").addEventListener("click", () => {
       const rawName = nameInput.value.trim();
       if (!rawName) {
@@ -503,45 +465,18 @@
         return;
       }
 
-      const key = rawName.toLowerCase();
-      if (!data[key]) {
-        data[key] = { name: rawName, emoji: selectedEmoji, dates: [] };
-      } else {
-        data[key].name = rawName;
-        data[key].emoji = selectedEmoji;
-      }
-
+      profile.name = rawName;
+      profile.hasSaved = true;
       persistStorage();
       render();
-      const count = data[key].dates.length;
-      showNotice(`✓ Saved! ${selectedEmoji} ${rawName}'s availability (${count} ${count === 1 ? "day" : "days"}) is updated.`, true);
-    });
-
-    // Next Person button
-    document.getElementById("next-person-btn").addEventListener("click", () => {
-      hideNotice();
-      nameInput.value = "";
-      selectedEmoji = getUnusedEmoji();
-      nameInput.focus();
-      render();
+      showNotice(`✅ Saved! Your availability is locked in. You can return here anytime to update your days.`, true);
     });
 
     function selectEmoji(emoji) {
-      selectedEmoji = emoji;
-      const key = currentKey();
-      if (key && data[key]) {
-        data[key].emoji = emoji;
+      profile.emoji = emoji;
+      if (profile.hasSaved) {
         persistStorage();
       }
-      render();
-    }
-
-    function loadPersonForEdit(key) {
-      const person = data[key];
-      if (!person) return;
-      hideNotice();
-      nameInput.value = person.name;
-      selectedEmoji = person.emoji || EMOJIS[0];
       render();
     }
 
@@ -553,22 +488,15 @@
         return;
       }
       hideNotice();
-      const key = rawName.toLowerCase();
-      if (!data[key]) {
-        data[key] = { name: rawName, emoji: selectedEmoji, dates: [] };
-      } else {
-        data[key].name = rawName;
-        data[key].emoji = selectedEmoji;
-      }
+      profile.name = rawName;
 
-      const list = data[key].dates;
-      const idx = list.indexOf(isoDate);
+      const idx = profile.dates.indexOf(isoDate);
       if (idx === -1) {
-        list.push(isoDate);
+        profile.dates.push(isoDate);
       } else {
-        list.splice(idx, 1);
+        profile.dates.splice(idx, 1);
       }
-      list.sort();
+      profile.dates.sort();
       persistStorage();
       render();
     }
@@ -580,54 +508,28 @@
     }
 
     function render() {
-      const key = currentKey();
-      const myDates = (key && data[key]) ? data[key].dates : [];
+      const cleanName = nameInput.value.trim();
+      const myDates = profile.dates;
 
       // Render Emoji Picker
       emojiGridEl.innerHTML = "";
       EMOJIS.forEach(emoji => {
         const btn = document.createElement("button");
         btn.type = "button";
-        btn.className = "emoji-btn" + (selectedEmoji === emoji ? " active" : "");
+        btn.className = "emoji-btn" + (profile.emoji === emoji ? " active" : "");
         btn.textContent = emoji;
         btn.title = `Select ${emoji}`;
         btn.onclick = () => selectEmoji(emoji);
         emojiGridEl.appendChild(btn);
       });
 
-      if (key) {
-        statusText.textContent = `Editing ${selectedEmoji} ${nameInput.value.trim()} — ${myDates.length} ${myDates.length === 1 ? "day" : "days"} selected. Click "Save Selections" when done.`;
+      if (profile.hasSaved && cleanName) {
+        statusText.textContent = `Your Saved Availability: ${profile.emoji} ${cleanName} (${myDates.length} ${myDates.length === 1 ? "day" : "days"}). Update your name, icon, or days anytime and click "Save Selections".`;
+      } else if (cleanName) {
+        statusText.textContent = `Selecting days for ${profile.emoji} ${cleanName} (${myDates.length} selected) — click "Save Selections" when finished.`;
       } else {
-        statusText.textContent = "Type your name above (or click a saved name below to edit), then click days you are free.";
+        statusText.textContent = "One submission per person — you can return anytime to update your dates.";
       }
-
-      // Render Saved People Pills
-      const savedEntries = Object.entries(data);
-      if (savedEntries.length > 0) {
-        savedPeopleSection.classList.add("visible");
-        savedPeopleList.innerHTML = "";
-        savedEntries.forEach(([personKey, person]) => {
-          const pill = document.createElement("button");
-          pill.type = "button";
-          pill.className = "person-pill" + (personKey === key ? " active" : "");
-          pill.textContent = `${person.emoji || "🎄"} ${person.name}`;
-          pill.title = `Click to edit ${person.name}'s dates`;
-          pill.onclick = () => loadPersonForEdit(personKey);
-          savedPeopleList.appendChild(pill);
-        });
-      } else {
-        savedPeopleSection.classList.remove("visible");
-      }
-
-      // Build map of date -> list of people objects
-      const dateMap = {};
-      const activePeople = Object.values(data).filter(p => p.dates && p.dates.length > 0);
-      activePeople.forEach(person => {
-        person.dates.forEach(d => {
-          if (!dateMap[d]) dateMap[d] = [];
-          dateMap[d].push({ name: person.name, emoji: person.emoji || "🎄" });
-        });
-      });
 
       // Render Calendars
       calendarsEl.innerHTML = "";
@@ -661,21 +563,21 @@
           const mm = String(m.month + 1).padStart(2, "0");
           const dd = String(day).padStart(2, "0");
           const iso = `${m.year}-${mm}-${dd}`;
+          const isSelected = myDates.includes(iso);
 
           const btn = document.createElement("button");
           btn.type = "button";
-          btn.className = "day-btn" + (myDates.includes(iso) ? " selected" : "");
+          btn.className = "day-btn" + (isSelected ? " selected" : "");
           btn.onclick = () => toggleDay(iso);
 
           const numSpan = document.createElement("span");
           numSpan.textContent = day;
           btn.appendChild(numSpan);
 
-          const peopleOnDay = dateMap[iso] || [];
           const emojiSpan = document.createElement("span");
           emojiSpan.className = "day-emojis";
-          if (peopleOnDay.length > 0) {
-            emojiSpan.textContent = peopleOnDay.map(p => p.emoji).join("");
+          if (isSelected) {
+            emojiSpan.textContent = profile.emoji;
           }
           btn.appendChild(emojiSpan);
 
@@ -686,25 +588,20 @@
         calendarsEl.appendChild(box);
       });
 
-      // Render Results
-      totalPeopleEl.textContent = `${activePeople.length} ${activePeople.length === 1 ? "person" : "people"} responded`;
+      // Render Results for the single saved profile
+      const displayName = cleanName || "You";
+      const hasAnyDates = myDates.length > 0;
+      totalPeopleEl.textContent = hasAnyDates ? "1 submission saved" : "0 submissions yet";
       resultsEl.innerHTML = "";
 
-      const entries = Object.entries(dateMap).sort((a, b) => {
-        if (b[1].length !== a[1].length) return b[1].length - a[1].length;
-        return a[0].localeCompare(b[0]);
-      });
-
-      if (entries.length === 0) {
+      if (!hasAnyDates) {
         resultsEl.innerHTML = `<p class="helper-text" style="margin:0;">No dates selected yet.</p>`;
         return;
       }
 
-      const maxCount = entries[0][1].length;
-
-      entries.forEach(([iso, people]) => {
+      myDates.forEach(iso => {
         const row = document.createElement("div");
-        row.className = "result-row" + (people.length === maxCount && maxCount > 1 ? " best" : "");
+        row.className = "result-row best";
 
         const left = document.createElement("div");
         const dateSpan = document.createElement("span");
@@ -713,14 +610,14 @@
 
         const pill = document.createElement("span");
         pill.className = "count-pill";
-        pill.textContent = `${people.length} free`;
+        pill.textContent = "1 free";
 
         left.appendChild(dateSpan);
         left.appendChild(pill);
 
         const right = document.createElement("div");
         right.className = "names-list";
-        right.textContent = people.map(p => `${p.emoji} ${p.name}`).join(", ");
+        right.textContent = `${profile.emoji} ${displayName}`;
 
         row.appendChild(left);
         row.appendChild(right);
@@ -728,7 +625,6 @@
       });
     }
 
-    selectedEmoji = getUnusedEmoji();
     render();
   </script>
 </body>
