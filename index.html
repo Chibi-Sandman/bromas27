@@ -104,17 +104,107 @@
       background: #f0f7f4;
     }
 
-    .btn-danger {
-      border-color: var(--berry);
-      color: var(--berry);
+    .btn-primary {
+      background: var(--pine);
+      color: #fff;
+      border-color: var(--pine);
     }
 
-    .btn-danger:hover {
-      background: #fff5f5;
+    .btn-primary:hover {
+      background: #1f5c43;
+    }
+
+    /* Emoji Picker */
+    .emoji-section {
+      margin-top: 14px;
+    }
+
+    .emoji-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .emoji-btn {
+      width: 40px;
+      height: 40px;
+      font-size: 1.25rem;
+      border-radius: 10px;
+      border: 2px solid var(--border);
+      background: var(--cream);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.12s ease;
+    }
+
+    .emoji-btn:hover {
+      border-color: var(--pine);
+      background: #fff;
+    }
+
+    .emoji-btn.active {
+      border-color: var(--pine);
+      background: #e6f2ed;
+      box-shadow: 0 0 0 2px rgba(22, 66, 48, 0.2);
+      transform: translateY(-1px);
+    }
+
+    /* Saved People Bar */
+    .saved-people-section {
+      display: none;
+      margin-top: 16px;
+      padding-top: 14px;
+      border-top: 1px solid var(--border);
+    }
+
+    .saved-people-section.visible {
+      display: block;
+    }
+
+    .saved-people-label {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--muted);
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .saved-people-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .person-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1.5px solid var(--border);
+      background: var(--cream);
+      color: var(--text);
+      font-size: 0.88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.12s ease;
+    }
+
+    .person-pill:hover {
+      border-color: var(--pine);
+      background: #f0f7f4;
+    }
+
+    .person-pill.active {
+      background: var(--pine);
+      border-color: var(--pine);
+      color: #fff;
     }
 
     .helper-text {
-      margin: 10px 0 0;
+      margin: 12px 0 0;
       font-size: 0.9rem;
       color: var(--muted);
     }
@@ -135,6 +225,12 @@
       border: 1px solid #f5c2c4;
     }
 
+    .notice-banner.success {
+      background: #ecfdf5;
+      color: #065f46;
+      border-color: #a7f3d0;
+    }
+
     .notice-banner.visible {
       display: flex;
     }
@@ -150,15 +246,9 @@
       font-size: 0.82rem;
       font-weight: 700;
       cursor: pointer;
-      border: 1px solid var(--berry);
-      background: var(--berry);
-      color: #fff;
-    }
-
-    .notice-btn.secondary {
+      border: 1px solid var(--border);
       background: #fff;
       color: var(--text);
-      border-color: var(--border);
     }
 
     /* 2. Calendars */
@@ -223,15 +313,13 @@
       color: #fff;
     }
 
-    .day-badge {
-      font-size: 0.68rem;
+    .day-emojis {
+      font-size: 0.72rem;
+      line-height: 1.1;
       margin-top: 2px;
-      color: var(--berry);
-      font-weight: 700;
-    }
-
-    .day-btn.selected .day-badge {
-      color: #ffd166;
+      min-height: 14px;
+      letter-spacing: -1px;
+      word-break: break-all;
     }
 
     /* 3. Results */
@@ -288,26 +376,31 @@
   </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <h1>🎄 Meetup Availability Calendar</h1>
-      <p>December 1, 2026 – January 31, 2027</p>
-    </header>
-
-    <!-- 1. NAME ENTRY -->
+    <!-- 1. NAME ENTRY, EMOJI SELECTOR & SAVE -->
     <div class="card">
       <div class="name-row">
         <div class="name-group">
           <label for="person-name">Your Name</label>
           <input type="text" id="person-name" placeholder="Enter your name..." maxlength="40" />
         </div>
+        <button type="button" class="btn btn-primary" id="save-btn">Save Selections</button>
         <button type="button" class="btn" id="next-person-btn">+ Next Person</button>
-        <button type="button" class="btn btn-danger" id="reset-all-btn">Reset All</button>
       </div>
+
+      <div class="emoji-section">
+        <label>Pick Your Holiday Icon</label>
+        <div class="emoji-grid" id="emoji-grid"></div>
+      </div>
+
       <p class="helper-text" id="status-text">Type your name above, then click all days you are free below.</p>
       <div class="notice-banner" id="notice-banner">
         <span id="notice-msg"></span>
         <div class="notice-actions" id="notice-actions"></div>
+      </div>
+
+      <div class="saved-people-section" id="saved-people-section">
+        <span class="saved-people-label">Saved People (Click to Edit)</span>
+        <div class="saved-people-list" id="saved-people-list"></div>
       </div>
     </div>
 
@@ -332,6 +425,8 @@
       { year: 2027, month: 0,  title: "January 2027",  days: 31 }
     ];
 
+    const EMOJIS = ["🎄", "🎅", "⛄", "🦌", "🎁", "❄️", "🔔", "🍪", "✨", "🥂"];
+
     let data = {};
     try {
       data = JSON.parse(localStorage.getItem("simple_meetup_2026") || "{}");
@@ -339,7 +434,10 @@
       data = {};
     }
 
+    let selectedEmoji = EMOJIS[0];
+
     const nameInput = document.getElementById("person-name");
+    const emojiGridEl = document.getElementById("emoji-grid");
     const statusText = document.getElementById("status-text");
     const calendarsEl = document.getElementById("calendars");
     const resultsEl = document.getElementById("results");
@@ -347,37 +445,26 @@
     const noticeBanner = document.getElementById("notice-banner");
     const noticeMsg = document.getElementById("notice-msg");
     const noticeActions = document.getElementById("notice-actions");
+    const savedPeopleSection = document.getElementById("saved-people-section");
+    const savedPeopleList = document.getElementById("saved-people-list");
 
-    function showNotice(message, confirmCallback = null) {
+    function getUnusedEmoji() {
+      const used = new Set(Object.values(data).map(p => p.emoji).filter(Boolean));
+      const available = EMOJIS.find(e => !used.has(e));
+      return available || EMOJIS[Object.keys(data).length % EMOJIS.length];
+    }
+
+    function showNotice(message, isSuccess = false) {
       noticeMsg.textContent = message;
       noticeActions.innerHTML = "";
+      noticeBanner.classList.toggle("success", isSuccess);
 
-      if (confirmCallback) {
-        const yesBtn = document.createElement("button");
-        yesBtn.type = "button";
-        yesBtn.className = "notice-btn";
-        yesBtn.textContent = "Yes, Clear All";
-        yesBtn.onclick = () => {
-          hideNotice();
-          confirmCallback();
-        };
-
-        const cancelBtn = document.createElement("button");
-        cancelBtn.type = "button";
-        cancelBtn.className = "notice-btn secondary";
-        cancelBtn.textContent = "Cancel";
-        cancelBtn.onclick = hideNotice;
-
-        noticeActions.appendChild(yesBtn);
-        noticeActions.appendChild(cancelBtn);
-      } else {
-        const okBtn = document.createElement("button");
-        okBtn.type = "button";
-        okBtn.className = "notice-btn secondary";
-        okBtn.textContent = "Dismiss";
-        okBtn.onclick = hideNotice;
-        noticeActions.appendChild(okBtn);
-      }
+      const okBtn = document.createElement("button");
+      okBtn.type = "button";
+      okBtn.className = "notice-btn";
+      okBtn.textContent = "Dismiss";
+      okBtn.onclick = hideNotice;
+      noticeActions.appendChild(okBtn);
 
       noticeBanner.classList.add("visible");
     }
@@ -386,7 +473,7 @@
       noticeBanner.classList.remove("visible");
     }
 
-    function save() {
+    function persistStorage() {
       try {
         localStorage.setItem("simple_meetup_2026", JSON.stringify(data));
       } catch (e) {}
@@ -397,45 +484,81 @@
       return raw ? raw.toLowerCase() : "";
     }
 
+    // Automatically load existing saved person if user types a matching saved name
     nameInput.addEventListener("input", () => {
       hideNotice();
       const key = currentKey();
       if (key && data[key]) {
-        data[key].name = nameInput.value.trim();
-        save();
+        selectedEmoji = data[key].emoji || selectedEmoji;
       }
       render();
     });
 
+    // Explicit Save button
+    document.getElementById("save-btn").addEventListener("click", () => {
+      const rawName = nameInput.value.trim();
+      if (!rawName) {
+        showNotice("Please enter your name before saving.", false);
+        nameInput.focus();
+        return;
+      }
+
+      const key = rawName.toLowerCase();
+      if (!data[key]) {
+        data[key] = { name: rawName, emoji: selectedEmoji, dates: [] };
+      } else {
+        data[key].name = rawName;
+        data[key].emoji = selectedEmoji;
+      }
+
+      persistStorage();
+      render();
+      const count = data[key].dates.length;
+      showNotice(`✓ Saved! ${selectedEmoji} ${rawName}'s availability (${count} ${count === 1 ? "day" : "days"}) is updated.`, true);
+    });
+
+    // Next Person button
     document.getElementById("next-person-btn").addEventListener("click", () => {
       hideNotice();
       nameInput.value = "";
+      selectedEmoji = getUnusedEmoji();
       nameInput.focus();
       render();
     });
 
-    document.getElementById("reset-all-btn").addEventListener("click", () => {
-      showNotice("Clear all names and selected dates?", () => {
-        data = {};
-        nameInput.value = "";
-        save();
-        render();
-      });
-    });
+    function selectEmoji(emoji) {
+      selectedEmoji = emoji;
+      const key = currentKey();
+      if (key && data[key]) {
+        data[key].emoji = emoji;
+        persistStorage();
+      }
+      render();
+    }
+
+    function loadPersonForEdit(key) {
+      const person = data[key];
+      if (!person) return;
+      hideNotice();
+      nameInput.value = person.name;
+      selectedEmoji = person.emoji || EMOJIS[0];
+      render();
+    }
 
     function toggleDay(isoDate) {
       const rawName = nameInput.value.trim();
       if (!rawName) {
-        showNotice("Please enter your name in the box above first.");
+        showNotice("Please enter your name in the box above first.", false);
         nameInput.focus();
         return;
       }
       hideNotice();
       const key = rawName.toLowerCase();
       if (!data[key]) {
-        data[key] = { name: rawName, dates: [] };
+        data[key] = { name: rawName, emoji: selectedEmoji, dates: [] };
       } else {
         data[key].name = rawName;
+        data[key].emoji = selectedEmoji;
       }
 
       const list = data[key].dates;
@@ -446,7 +569,7 @@
         list.splice(idx, 1);
       }
       list.sort();
-      save();
+      persistStorage();
       render();
     }
 
@@ -460,19 +583,49 @@
       const key = currentKey();
       const myDates = (key && data[key]) ? data[key].dates : [];
 
+      // Render Emoji Picker
+      emojiGridEl.innerHTML = "";
+      EMOJIS.forEach(emoji => {
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "emoji-btn" + (selectedEmoji === emoji ? " active" : "");
+        btn.textContent = emoji;
+        btn.title = `Select ${emoji}`;
+        btn.onclick = () => selectEmoji(emoji);
+        emojiGridEl.appendChild(btn);
+      });
+
       if (key) {
-        statusText.textContent = `Selecting days for ${nameInput.value.trim()} (${myDates.length} selected)`;
+        statusText.textContent = `Editing ${selectedEmoji} ${nameInput.value.trim()} — ${myDates.length} ${myDates.length === 1 ? "day" : "days"} selected. Click "Save Selections" when done.`;
       } else {
-        statusText.textContent = "Type your name above, then click all days you are free below.";
+        statusText.textContent = "Type your name above (or click a saved name below to edit), then click days you are free.";
       }
 
-      // Build map of date -> list of names
+      // Render Saved People Pills
+      const savedEntries = Object.entries(data);
+      if (savedEntries.length > 0) {
+        savedPeopleSection.classList.add("visible");
+        savedPeopleList.innerHTML = "";
+        savedEntries.forEach(([personKey, person]) => {
+          const pill = document.createElement("button");
+          pill.type = "button";
+          pill.className = "person-pill" + (personKey === key ? " active" : "");
+          pill.textContent = `${person.emoji || "🎄"} ${person.name}`;
+          pill.title = `Click to edit ${person.name}'s dates`;
+          pill.onclick = () => loadPersonForEdit(personKey);
+          savedPeopleList.appendChild(pill);
+        });
+      } else {
+        savedPeopleSection.classList.remove("visible");
+      }
+
+      // Build map of date -> list of people objects
       const dateMap = {};
       const activePeople = Object.values(data).filter(p => p.dates && p.dates.length > 0);
       activePeople.forEach(person => {
         person.dates.forEach(d => {
           if (!dateMap[d]) dateMap[d] = [];
-          dateMap[d].push(person.name);
+          dateMap[d].push({ name: person.name, emoji: person.emoji || "🎄" });
         });
       });
 
@@ -518,13 +671,13 @@
           numSpan.textContent = day;
           btn.appendChild(numSpan);
 
-          const count = dateMap[iso] ? dateMap[iso].length : 0;
-          if (count > 0) {
-            const badge = document.createElement("span");
-            badge.className = "day-badge";
-            badge.textContent = `${count}✓`;
-            btn.appendChild(badge);
+          const peopleOnDay = dateMap[iso] || [];
+          const emojiSpan = document.createElement("span");
+          emojiSpan.className = "day-emojis";
+          if (peopleOnDay.length > 0) {
+            emojiSpan.textContent = peopleOnDay.map(p => p.emoji).join("");
           }
+          btn.appendChild(emojiSpan);
 
           daysGrid.appendChild(btn);
         }
@@ -549,9 +702,9 @@
 
       const maxCount = entries[0][1].length;
 
-      entries.forEach(([iso, names]) => {
+      entries.forEach(([iso, people]) => {
         const row = document.createElement("div");
-        row.className = "result-row" + (names.length === maxCount && maxCount > 1 ? " best" : "");
+        row.className = "result-row" + (people.length === maxCount && maxCount > 1 ? " best" : "");
 
         const left = document.createElement("div");
         const dateSpan = document.createElement("span");
@@ -560,14 +713,14 @@
 
         const pill = document.createElement("span");
         pill.className = "count-pill";
-        pill.textContent = `${names.length} free`;
+        pill.textContent = `${people.length} free`;
 
         left.appendChild(dateSpan);
         left.appendChild(pill);
 
         const right = document.createElement("div");
         right.className = "names-list";
-        right.textContent = names.join(", ");
+        right.textContent = people.map(p => `${p.emoji} ${p.name}`).join(", ");
 
         row.appendChild(left);
         row.appendChild(right);
@@ -575,6 +728,7 @@
       });
     }
 
+    selectedEmoji = getUnusedEmoji();
     render();
   </script>
 </body>
