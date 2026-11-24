@@ -43,14 +43,14 @@
 
     header h1 {
       margin: 0 0 6px;
-      font-size: 1.9rem;
+      font-size: 2rem;
       letter-spacing: -0.02em;
     }
 
     header p {
       margin: 0;
       color: #d9e8e0;
-      font-size: 0.98rem;
+      font-size: 1rem;
     }
 
     .card {
@@ -58,7 +58,7 @@
       border-radius: 16px;
       padding: 24px;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25);
-      border: 2px solid rgba(212, 163, 56, 0.35);
+      border: 2px solid rgba(212, 163, 56, 0.45);
       margin-bottom: 20px;
     }
 
@@ -68,7 +68,7 @@
       border: 1.5px solid #d9e2ec;
       border-radius: 12px;
       padding: 16px;
-      margin-bottom: 20px;
+      margin-bottom: 22px;
     }
 
     .selector-row {
@@ -83,7 +83,7 @@
     }
 
     .emoji-field {
-      flex: 2 1 320px;
+      flex: 2 1 340px;
     }
 
     label {
@@ -204,7 +204,7 @@
 
     .month-card {
       background: var(--cream);
-      border: 1px solid var(--border);
+      border: 1.5px solid #e2e8f0;
       border-radius: 12px;
       padding: 16px;
     }
@@ -407,6 +407,15 @@
       <div class="months-grid" id="months-grid"></div>
     </div>
 
+    <!-- AGGREGATE RESULTS -->
+    <div class="card">
+      <div class="agg-header">
+        <h2>🎁 Best Days to Meet (Ranked by Availability)</h2>
+        <span id="participant-count" style="font-weight:600; color:var(--muted); font-size:0.9rem;"></span>
+      </div>
+      <div id="aggregate-list"></div>
+    </div>
+
     <!-- EXPORT / IMPORT CODES -->
     <div class="card">
       <div class="share-grid">
@@ -421,13 +430,3 @@
         <div class="share-box">
           <h3>📥 Merge Friends' Codes</h3>
           <p>Paste codes from your group (separated by spaces or new lines) to combine totals.</p>
-          <textarea id="import-code" class="code-output" placeholder="Paste friend codes here..."></textarea>
-          <button class="btn btn-primary" id="import-btn">Merge Into Calendar</button>
-          <div id="import-status" class="status-msg"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- AGGREGATE RESULTS -->
-    <div class="card">
-      <div class="agg-header">
