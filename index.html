@@ -37,62 +37,6 @@
       z-index: 0;
     }
 
-    /* Custom Glowing Christmas Light Cursor (Desktop Pointer Devices) */
-    @media (hover: hover) and (pointer: fine) {
-      body, a, button, input {
-        cursor: none !important;
-      }
-
-      #xmas-cursor {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9999;
-        transform: translate(-50%, -50%);
-        border: 2px solid #ffffff;
-        animation: xmas-bulb-glow 1.6s infinite steps(1);
-        transition: width 0.12s ease, height 0.12s ease;
-      }
-
-      #xmas-cursor.clicking {
-        width: 22px;
-        height: 22px;
-      }
-
-      .xmas-spark {
-        position: fixed;
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        pointer-events: none;
-        z-index: 9998;
-        transform: translate(-50%, -50%);
-        animation: spark-fade 0.65s ease-out forwards;
-      }
-    }
-
-    @media (hover: none) or (pointer: coarse) {
-      #xmas-cursor {
-        display: none;
-      }
-    }
-
-    @keyframes xmas-bulb-glow {
-      0%   { background: #ff2a2a; box-shadow: 0 0 10px #ff2a2a, 0 0 20px #ff2a2a; }
-      25%  { background: #2ecc71; box-shadow: 0 0 10px #2ecc71, 0 0 20px #2ecc71; }
-      50%  { background: #ffd166; box-shadow: 0 0 10px #ffd166, 0 0 20px #ffd166; }
-      75%  { background: #38bdf8; box-shadow: 0 0 10px #38bdf8, 0 0 20px #38bdf8; }
-    }
-
-    @keyframes spark-fade {
-      0%   { opacity: 0.95; transform: translate(-50%, -50%) scale(1); }
-      100% { opacity: 0; transform: translate(-50%, -20%) scale(0.2); }
-    }
-
     @keyframes xmas-caret {
       0%, 100% { caret-color: #d90429; }
       33%      { caret-color: #16a34a; }
@@ -109,4 +53,314 @@
     header {
       text-align: center;
       color: #fff;
-      margin-bottom: 2
+      margin-bottom: 20px;
+    }
+
+    header h1 {
+      margin: 0 0 6px;
+      font-size: 1.8rem;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
+    }
+
+    header p {
+      margin: 0;
+      color: #d9e8e0;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 14px;
+      padding: 22px;
+      margin-bottom: 20px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+    }
+
+    /* 1. Name & Emoji Entry */
+    .name-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .name-group {
+      flex: 1 1 240px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--pine);
+      font-size: 0.95rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 11px 14px;
+      font-size: 1rem;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      animation: xmas-caret 1.2s infinite steps(1);
+    }
+
+    input[type="text"]:focus {
+      outline: none;
+      border-color: var(--pine);
+    }
+
+    .emoji-section {
+      margin-top: 14px;
+    }
+
+    .emoji-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .emoji-btn {
+      width: 42px;
+      height: 42px;
+      border: 2px solid var(--border);
+      border-radius: 10px;
+      background: #fff;
+      font-size: 1.35rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .emoji-btn:hover {
+      border-color: var(--pine);
+      transform: translateY(-1px);
+    }
+
+    .emoji-btn.active {
+      border-color: var(--pine);
+      background: #e6f4ee;
+      box-shadow: 0 0 0 2px rgba(22, 66, 48, 0.15);
+    }
+
+    .btn-primary {
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      background: var(--pine);
+      color: #fff;
+      transition: background 0.15s ease;
+    }
+
+    .btn-primary:hover {
+      background: #103224;
+    }
+
+    .btn-primary:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .helper-text {
+      margin: 12px 0 0;
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .save-feedback {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: #e6f4ee;
+      color: var(--pine);
+      font-size: 0.88rem;
+      font-weight: 600;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .save-feedback.show {
+      opacity: 1;
+    }
+
+    /* 2. Calendars */
+    .months-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .month-box {
+      background: var(--cream);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+
+    .month-title {
+      text-align: center;
+      margin: 0 0 12px;
+      font-size: 1.15rem;
+      color: var(--berry);
+    }
+
+    .weekdays, .days {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      text-align: center;
+    }
+
+    .weekdays div {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--muted);
+      padding-bottom: 4px;
+    }
+
+    .day-btn {
+      min-height: 54px;
+      padding: 4px 2px;
+      border: 1.5px solid var(--border);
+      border-radius: 8px;
+      background: #fff;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: var(--text);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+    }
+
+    .day-btn:hover {
+      border-color: var(--pine);
+    }
+
+    .day-btn.selected {
+      background: var(--pine);
+      border-color: var(--pine);
+      color: #fff;
+    }
+
+    .day-emojis {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1px;
+      margin-top: 3px;
+      font-size: 0.78rem;
+      line-height: 1.1;
+    }
+
+    /* 3. Results */
+    .results-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+    }
+
+    .results-header h2 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--pine);
+    }
+
+    .result-row {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      background: var(--cream);
+    }
+
+    .result-row.best {
+      border-color: #d4a338;
+      background: #fffbeb;
+    }
+
+    .date-label {
+      font-weight: 700;
+      color: var(--pine);
+    }
+
+    .count-pill {
+      background: var(--berry);
+      color: #fff;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+      margin-left: 8px;
+    }
+
+    .names-list {
+      font-size: 0.92rem;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+  <canvas id="snow-canvas"></canvas>
+
+  <div class="container">
+    <header>
+      <h1>🎄 Bromas 2k27 Availability</h1>
+      <p>December 1, 2026 – January 31, 2027</p>
+    </header>
+
+    <!-- 1. NAME & EMOJI ENTRY -->
+    <div class="card">
+      <div class="name-row">
+        <div class="name-group">
+          <label for="person-name">Your Name</label>
+          <input type="text" id="person-name" placeholder="Enter your name..." maxlength="40" />
+        </div>
+        <button type="button" class="btn-primary" id="save-btn">Save Selections</button>
+      </div>
+
+      <div class="emoji-section">
+        <label>Pick Your Holiday Icon</label>
+        <div class="emoji-picker" id="emoji-picker"></div>
+      </div>
+
+      <p class="helper-text" id="status-text">Connecting to live group calendar...</p>
+      <div class="save-feedback" id="save-feedback"></div>
+    </div>
+
+    <!-- 2. CALENDAR SELECTION -->
+    <div class="card">
+      <div class="months-grid" id="calendars"></div>
+    </div>
+
+    <!-- 3. RESULTS BELOW -->
+    <div class="card">
+      <div class="results-header">
+        <h2>Best Days to Meet</h2>
+        <span id="total-people" style="font-size:0.9rem; color:var(--muted); font-weight:600;"></span>
+      </div>
+      <div id="results"></div>
+    </div>
+  </div>
+
+  <!-- Falling Snow Script -->
+  <script>
+    (function () {
+      const canvas = document.getElementById("snow-canvas");
+      const ctx = canvas.getContext("2d");
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener
