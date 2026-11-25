@@ -37,6 +37,68 @@
       z-index: 0;
     }
 
+    /* Custom Glowing Christmas Light Cursor (Desktop Pointer Devices) */
+    @media (hover: hover) and (pointer: fine) {
+      body, a, button, input {
+        cursor: none !important;
+      }
+
+      #xmas-cursor {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9999;
+        transform: translate(-50%, -50%);
+        border: 2px solid #ffffff;
+        animation: xmas-bulb-glow 1.6s infinite steps(1);
+        transition: width 0.12s ease, height 0.12s ease;
+      }
+
+      #xmas-cursor.clicking {
+        width: 22px;
+        height: 22px;
+      }
+
+      .xmas-spark {
+        position: fixed;
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 9998;
+        transform: translate(-50%, -50%);
+        animation: spark-fade 0.65s ease-out forwards;
+      }
+    }
+
+    @media (hover: none) or (pointer: coarse) {
+      #xmas-cursor {
+        display: none;
+      }
+    }
+
+    @keyframes xmas-bulb-glow {
+      0%   { background: #ff2a2a; box-shadow: 0 0 10px #ff2a2a, 0 0 20px #ff2a2a; }
+      25%  { background: #2ecc71; box-shadow: 0 0 10px #2ecc71, 0 0 20px #2ecc71; }
+      50%  { background: #ffd166; box-shadow: 0 0 10px #ffd166, 0 0 20px #ffd166; }
+      75%  { background: #38bdf8; box-shadow: 0 0 10px #38bdf8, 0 0 20px #38bdf8; }
+    }
+
+    @keyframes spark-fade {
+      0%   { opacity: 0.95; transform: translate(-50%, -50%) scale(1); }
+      100% { opacity: 0; transform: translate(-50%, -20%) scale(0.2); }
+    }
+
+    @keyframes xmas-caret {
+      0%, 100% { caret-color: #d90429; }
+      33%      { caret-color: #16a34a; }
+      66%      { caret-color: #eab308; }
+    }
+
     .container {
       position: relative;
       z-index: 1;
@@ -47,651 +109,4 @@
     header {
       text-align: center;
       color: #fff;
-      margin-bottom: 20px;
-    }
-
-    header h1 {
-      margin: 0 0 6px;
-      font-size: 1.8rem;
-      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
-    }
-
-    header p {
-      margin: 0;
-      color: #d9e8e0;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 14px;
-      padding: 22px;
-      margin-bottom: 20px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
-    }
-
-    /* 1. Name & Emoji Entry */
-    .name-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      align-items: flex-end;
-    }
-
-    .name-group {
-      flex: 1 1 240px;
-    }
-
-    label {
-      display: block;
-      font-weight: 700;
-      margin-bottom: 6px;
-      color: var(--pine);
-      font-size: 0.95rem;
-    }
-
-    input[type="text"] {
-      width: 100%;
-      padding: 11px 14px;
-      font-size: 1rem;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-    }
-
-    input[type="text"]:focus {
-      outline: none;
-      border-color: var(--pine);
-    }
-
-    .emoji-section {
-      margin-top: 14px;
-    }
-
-    .emoji-picker {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-
-    .emoji-btn {
-      width: 42px;
-      height: 42px;
-      border: 2px solid var(--border);
-      border-radius: 10px;
-      background: #fff;
-      font-size: 1.35rem;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: transform 0.1s ease, border-color 0.15s ease, background 0.15s ease;
-    }
-
-    .emoji-btn:hover {
-      border-color: var(--pine);
-      transform: translateY(-1px);
-    }
-
-    .emoji-btn.active {
-      border-color: var(--pine);
-      background: #e6f4ee;
-      box-shadow: 0 0 0 2px rgba(22, 66, 48, 0.15);
-    }
-
-    .btn-primary {
-      padding: 12px 20px;
-      border-radius: 10px;
-      font-size: 0.95rem;
-      font-weight: 700;
-      cursor: pointer;
-      border: none;
-      background: var(--pine);
-      color: #fff;
-      transition: background 0.15s ease;
-    }
-
-    .btn-primary:hover {
-      background: #103224;
-    }
-
-    .btn-primary:disabled {
-      opacity: 0.65;
-      cursor: not-allowed;
-    }
-
-    .helper-text {
-      margin: 12px 0 0;
-      font-size: 0.9rem;
-      color: var(--muted);
-    }
-
-    .save-feedback {
-      display: inline-block;
-      margin-top: 10px;
-      padding: 6px 12px;
-      border-radius: 8px;
-      background: #e6f4ee;
-      color: var(--pine);
-      font-size: 0.88rem;
-      font-weight: 600;
-      opacity: 0;
-      transition: opacity 0.2s ease;
-    }
-
-    .save-feedback.show {
-      opacity: 1;
-    }
-
-    /* 2. Calendars */
-    .months-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 20px;
-    }
-
-    .month-box {
-      background: var(--cream);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 16px;
-    }
-
-    .month-title {
-      text-align: center;
-      margin: 0 0 12px;
-      font-size: 1.15rem;
-      color: var(--berry);
-    }
-
-    .weekdays, .days {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 6px;
-      text-align: center;
-    }
-
-    .weekdays div {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--muted);
-      padding-bottom: 4px;
-    }
-
-    .day-btn {
-      min-height: 54px;
-      padding: 4px 2px;
-      border: 1.5px solid var(--border);
-      border-radius: 8px;
-      background: #fff;
-      font-size: 0.92rem;
-      font-weight: 700;
-      color: var(--text);
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-    }
-
-    .day-btn:hover {
-      border-color: var(--pine);
-    }
-
-    .day-btn.selected {
-      background: var(--pine);
-      border-color: var(--pine);
-      color: #fff;
-    }
-
-    .day-emojis {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 1px;
-      margin-top: 3px;
-      font-size: 0.78rem;
-      line-height: 1.1;
-    }
-
-    /* 3. Results */
-    .results-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-
-    .results-header h2 {
-      margin: 0;
-      font-size: 1.2rem;
-      color: var(--pine);
-    }
-
-    .result-row {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 14px;
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      margin-bottom: 8px;
-      background: var(--cream);
-    }
-
-    .result-row.best {
-      border-color: #d4a338;
-      background: #fffbeb;
-    }
-
-    .date-label {
-      font-weight: 700;
-      color: var(--pine);
-    }
-
-    .count-pill {
-      background: var(--berry);
-      color: #fff;
-      font-size: 0.78rem;
-      font-weight: 700;
-      padding: 3px 9px;
-      border-radius: 999px;
-      margin-left: 8px;
-    }
-
-    .names-list {
-      font-size: 0.92rem;
-      color: var(--text);
-    }
-  </style>
-</head>
-<body>
-  <canvas id="snow-canvas"></canvas>
-
-  <div class="container">
-    <header>
-      <h1>🎄 Bromas 2k27 Availability</h1>
-      <p>December 1, 2026 – January 31, 2027</p>
-    </header>
-
-    <!-- 1. NAME & EMOJI ENTRY -->
-    <div class="card">
-      <div class="name-row">
-        <div class="name-group">
-          <label for="person-name">Your Name</label>
-          <input type="text" id="person-name" placeholder="Enter your name..." maxlength="40" />
-        </div>
-        <button type="button" class="btn-primary" id="save-btn">Save Selections</button>
-      </div>
-
-      <div class="emoji-section">
-        <label>Pick Your Holiday Icon</label>
-        <div class="emoji-picker" id="emoji-picker"></div>
-      </div>
-
-      <p class="helper-text" id="status-text">Connecting to live group calendar...</p>
-      <div class="save-feedback" id="save-feedback"></div>
-    </div>
-
-    <!-- 2. CALENDAR SELECTION -->
-    <div class="card">
-      <div class="months-grid" id="calendars"></div>
-    </div>
-
-    <!-- 3. RESULTS BELOW -->
-    <div class="card">
-      <div class="results-header">
-        <h2>Best Days to Meet</h2>
-        <span id="total-people" style="font-size:0.9rem; color:var(--muted); font-weight:600;"></span>
-      </div>
-      <div id="results"></div>
-    </div>
-  </div>
-
-  <!-- Falling Snow Script -->
-  <script>
-    (function () {
-      const canvas = document.getElementById("snow-canvas");
-      const ctx = canvas.getContext("2d");
-      let width = (canvas.width = window.innerWidth);
-      let height = (canvas.height = window.innerHeight);
-
-      window.addEventListener("resize", () => {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
-      });
-
-      const flakeCount = Math.min(90, Math.floor(width / 14));
-      const flakes = Array.from({ length: flakeCount }, () => ({
-        x: Math.random() * width,
-        y: Math.random() * height,
-        r: Math.random() * 2.8 + 1.2,
-        speedY: Math.random() * 1.1 + 0.45,
-        swayAmp: Math.random() * 0.7 + 0.2,
-        swayOffset: Math.random() * Math.PI * 2,
-        opacity: Math.random() * 0.55 + 0.25
-      }));
-
-      let tick = 0;
-      function drawSnow() {
-        ctx.clearRect(0, 0, width, height);
-        tick += 0.015;
-
-        for (const f of flakes) {
-          f.y += f.speedY;
-          f.x += Math.sin(tick + f.swayOffset) * f.swayAmp;
-
-          if (f.y > height + 5) {
-            f.y = -5;
-            f.x = Math.random() * width;
-          }
-          if (f.x > width + 5) f.x = -5;
-          if (f.x < -5) f.x = width + 5;
-
-          ctx.beginPath();
-          ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${f.opacity})`;
-          ctx.fill();
-        }
-
-        requestAnimationFrame(drawSnow);
-      }
-
-      drawSnow();
-    })();
-  </script>
-
-  <!-- Firebase App & Sync Script -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
-    import {
-      getFirestore,
-      collection,
-      doc,
-      setDoc,
-      onSnapshot
-    } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyAJ9UE9hLkkDC12sL5zAUa2DSmGaXO5Ey8",
-      authDomain: "bromas2k27.firebaseapp.com",
-      projectId: "bromas2k27",
-      storageBucket: "bromas2k27.firebasestorage.app",
-      messagingSenderId: "287688674853",
-      appId: "1:287688674853:web:2549ebb0e3cebe2a9b39cc",
-      measurementId: "G-ETNRE6JZ4M"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const responsesCol = collection(db, "responses");
-
-    const EMOJIS = ["🎄", "🎅", "⛄", "🦌", "🎁", "❄️", "🔔", "🍪", "✨", "🥂"];
-    const MONTHS = [
-      { year: 2026, month: 11, title: "December 2026", days: 31 },
-      { year: 2027, month: 0,  title: "January 2027",  days: 31 }
-    ];
-
-    const DEVICE_KEY = "bromas2k27_my_id";
-    let myId = localStorage.getItem(DEVICE_KEY);
-    if (!myId) {
-      myId = "person_" + Math.random().toString(36).slice(2, 11) + Date.now().toString(36);
-      localStorage.setItem(DEVICE_KEY, myId);
-    }
-
-    let allPeople = {};
-    let myName = "";
-    let myEmoji = EMOJIS[0];
-    let myDates = [];
-    let initializedLocalFromCloud = false;
-    let feedbackTimer = null;
-
-    const nameInput = document.getElementById("person-name");
-    const emojiPickerEl = document.getElementById("emoji-picker");
-    const statusText = document.getElementById("status-text");
-    const saveFeedbackEl = document.getElementById("save-feedback");
-    const saveBtn = document.getElementById("save-btn");
-    const calendarsEl = document.getElementById("calendars");
-    const resultsEl = document.getElementById("results");
-    const totalPeopleEl = document.getElementById("total-people");
-
-    function showFeedback(msg) {
-      saveFeedbackEl.textContent = msg;
-      saveFeedbackEl.classList.add("show");
-      clearTimeout(feedbackTimer);
-      feedbackTimer = setTimeout(() => {
-        saveFeedbackEl.classList.remove("show");
-      }, 3500);
-    }
-
-    nameInput.addEventListener("input", () => {
-      myName = nameInput.value;
-      render();
-    });
-
-    saveBtn.addEventListener("click", async () => {
-      const trimmedName = nameInput.value.trim();
-      if (!trimmedName) {
-        alert("Please enter your name before saving.");
-        nameInput.focus();
-        return;
-      }
-
-      saveBtn.disabled = true;
-      saveBtn.textContent = "Saving...";
-
-      try {
-        await setDoc(doc(db, "responses", myId), {
-          name: trimmedName,
-          emoji: myEmoji,
-          dates: [...myDates].sort(),
-          updatedAt: Date.now()
-        });
-        showFeedback(`✓ Saved ${myEmoji} ${trimmedName} (${myDates.length} ${myDates.length === 1 ? "day" : "days"}) to live calendar!`);
-      } catch (err) {
-        console.error("Save failed:", err);
-        alert("Could not save to database. Make sure Firestore is enabled in Test Mode.");
-      } finally {
-        saveBtn.disabled = false;
-        saveBtn.textContent = "Save Selections";
-      }
-    });
-
-    function toggleDay(isoDate) {
-      if (!nameInput.value.trim()) {
-        alert("Please enter your name at the top first.");
-        nameInput.focus();
-        return;
-      }
-
-      const idx = myDates.indexOf(isoDate);
-      if (idx === -1) {
-        myDates.push(isoDate);
-      } else {
-        myDates.splice(idx, 1);
-      }
-      myDates.sort();
-      render();
-    }
-
-    function formatDate(iso) {
-      const parts = iso.split("-");
-      const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
-      return dt.toLocaleDateString("en-US", {
-        weekday: "short",
-        month: "short",
-        day: "numeric",
-        year: "numeric"
-      });
-    }
-
-    onSnapshot(responsesCol, (snapshot) => {
-      const fresh = {};
-      snapshot.forEach((docSnap) => {
-        fresh[docSnap.id] = docSnap.data();
-      });
-      allPeople = fresh;
-
-      if (!initializedLocalFromCloud) {
-        initializedLocalFromCloud = true;
-        if (allPeople[myId]) {
-          myName = allPeople[myId].name || "";
-          myEmoji = allPeople[myId].emoji || EMOJIS[0];
-          myDates = Array.isArray(allPeople[myId].dates) ? [...allPeople[myId].dates] : [];
-          nameInput.value = myName;
-        }
-      }
-
-      render();
-    }, (error) => {
-      console.error("Firestore listener error:", error);
-      statusText.textContent = "Unable to connect to database. Check Firestore Test Mode rules.";
-    });
-
-    function render() {
-      const trimmedName = nameInput.value.trim();
-
-      emojiPickerEl.innerHTML = "";
-      EMOJIS.forEach((em) => {
-        const btn = document.createElement("button");
-        btn.type = "button";
-        btn.className = "emoji-btn" + (myEmoji === em ? " active" : "");
-        btn.textContent = em;
-        btn.onclick = () => {
-          myEmoji = em;
-          render();
-        };
-        emojiPickerEl.appendChild(btn);
-      });
-
-      if (trimmedName) {
-        statusText.textContent = `Editing for ${myEmoji} ${trimmedName} (${myDates.length} ${myDates.length === 1 ? "day" : "days"} selected) — click Save Selections when done.`;
-      } else {
-        statusText.textContent = "Enter your name, pick an emoji, click your free days below, and hit Save Selections.";
-      }
-
-      const combinedPeople = { ...allPeople };
-      if (trimmedName || myDates.length > 0) {
-        combinedPeople[myId] = {
-          name: trimmedName || "You (unsaved)",
-          emoji: myEmoji,
-          dates: myDates
-        };
-      }
-
-      const dateMap = {};
-      const activePeople = Object.values(combinedPeople).filter(
-        (p) => p && Array.isArray(p.dates) && p.dates.length > 0
-      );
-
-      activePeople.forEach((person) => {
-        person.dates.forEach((d) => {
-          if (!dateMap[d]) dateMap[d] = [];
-          dateMap[d].push({
-            name: person.name,
-            emoji: person.emoji || "🎄"
-          });
-        });
-      });
-
-      calendarsEl.innerHTML = "";
-      MONTHS.forEach((m) => {
-        const box = document.createElement("div");
-        box.className = "month-box";
-
-        const heading = document.createElement("h3");
-        heading.className = "month-title";
-        heading.textContent = m.title;
-        box.appendChild(heading);
-
-        const wkRow = document.createElement("div");
-        wkRow.className = "weekdays";
-        ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].forEach((w) => {
-          const cell = document.createElement("div");
-          cell.textContent = w;
-          wkRow.appendChild(cell);
-        });
-        box.appendChild(wkRow);
-
-        const daysGrid = document.createElement("div");
-        daysGrid.className = "days";
-
-        const startWeekday = new Date(m.year, m.month, 1).getDay();
-        for (let i = 0; i < startWeekday; i++) {
-          daysGrid.appendChild(document.createElement("div"));
-        }
-
-        for (let day = 1; day <= m.days; day++) {
-          const mm = String(m.month + 1).padStart(2, "0");
-          const dd = String(day).padStart(2, "0");
-          const iso = `${m.year}-${mm}-${dd}`;
-
-          const btn = document.createElement("button");
-          btn.type = "button";
-          btn.className = "day-btn" + (myDates.includes(iso) ? " selected" : "");
-          btn.onclick = () => toggleDay(iso);
-
-          const numSpan = document.createElement("span");
-          numSpan.textContent = day;
-          btn.appendChild(numSpan);
-
-          const attendees = dateMap[iso] || [];
-          if (attendees.length > 0) {
-            const emojiWrap = document.createElement("div");
-            emojiWrap.className = "day-emojis";
-            emojiWrap.textContent = attendees.map((a) => a.emoji).join("");
-            btn.appendChild(emojiWrap);
-          }
-
-          daysGrid.appendChild(btn);
-        }
-
-        box.appendChild(daysGrid);
-        calendarsEl.appendChild(box);
-      });
-
-      totalPeopleEl.textContent = `${activePeople.length} ${activePeople.length === 1 ? "person" : "people"} responded`;
-      resultsEl.innerHTML = "";
-
-      const entries = Object.entries(dateMap).sort((a, b) => {
-        if (b[1].length !== a[1].length) return b[1].length - a[1].length;
-        return a[0].localeCompare(b[0]);
-      });
-
-      if (entries.length === 0) {
-        resultsEl.innerHTML = `<p class="helper-text" style="margin:0;">No dates selected yet.</p>`;
-        return;
-      }
-
-      const maxCount = entries[0][1].length;
-
-      entries.forEach(([iso, attendees]) => {
-        const row = document.createElement("div");
-        row.className = "result-row" + (attendees.length === maxCount && maxCount > 1 ? " best" : "");
-
-        const left = document.createElement("div");
-        const dateSpan = document.createElement("span");
-        dateSpan.className = "date-label";
-        dateSpan.textContent = formatDate(iso);
-
-        const pill = document.createElement("span");
-        pill.className = "count-pill";
-        pill.textContent = `${attendees.length} free`;
-
-        left.appendChild(dateSpan);
-        left.appendChild(pill);
-
-        const right = document.createElement("div");
-        right.className = "names-list";
-        right.textContent = attendees.map((a) => `${a.emoji} ${a.name}`).join(", ");
-
-        row.appendChild(left);
-        row.appendChild(right);
-        resultsEl.appendChild(row);
-      });
-    }
-
-    render();
-  </script>
-</body>
-</html>
+      margin-bottom: 2
