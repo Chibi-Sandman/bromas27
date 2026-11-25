@@ -24,9 +24,22 @@
       background: var(--pine-dark);
       color: var(--text);
       padding: 24px 16px 48px;
+      overflow-x: hidden;
+    }
+
+    #snow-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
     }
 
     .container {
+      position: relative;
+      z-index: 1;
       max-width: 880px;
       margin: 0 auto;
     }
@@ -40,6 +53,7 @@
     header h1 {
       margin: 0 0 6px;
       font-size: 1.8rem;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
     }
 
     header p {
@@ -52,7 +66,7 @@
       border-radius: 14px;
       padding: 22px;
       margin-bottom: 20px;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
     }
 
     /* 1. Name & Emoji Entry */
@@ -292,6 +306,8 @@
   </style>
 </head>
 <body>
+  <canvas id="snow-canvas"></canvas>
+
   <div class="container">
     <header>
       <h1>🎄 Bromas 2k27 Availability</h1>
@@ -332,6 +348,60 @@
     </div>
   </div>
 
+  <!-- Falling Snow Script -->
+  <script>
+    (function () {
+      const canvas = document.getElementById("snow-canvas");
+      const ctx = canvas.getContext("2d");
+      let width = (canvas.width = window.innerWidth);
+      let height = (canvas.height = window.innerHeight);
+
+      window.addEventListener("resize", () => {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+      });
+
+      const flakeCount = Math.min(90, Math.floor(width / 14));
+      const flakes = Array.from({ length: flakeCount }, () => ({
+        x: Math.random() * width,
+        y: Math.random() * height,
+        r: Math.random() * 2.8 + 1.2,
+        speedY: Math.random() * 1.1 + 0.45,
+        swayAmp: Math.random() * 0.7 + 0.2,
+        swayOffset: Math.random() * Math.PI * 2,
+        opacity: Math.random() * 0.55 + 0.25
+      }));
+
+      let tick = 0;
+      function drawSnow() {
+        ctx.clearRect(0, 0, width, height);
+        tick += 0.015;
+
+        for (const f of flakes) {
+          f.y += f.speedY;
+          f.x += Math.sin(tick + f.swayOffset) * f.swayAmp;
+
+          if (f.y > height + 5) {
+            f.y = -5;
+            f.x = Math.random() * width;
+          }
+          if (f.x > width + 5) f.x = -5;
+          if (f.x < -5) f.x = width + 5;
+
+          ctx.beginPath();
+          ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${f.opacity})`;
+          ctx.fill();
+        }
+
+        requestAnimationFrame(drawSnow);
+      }
+
+      drawSnow();
+    })();
+  </script>
+
+  <!-- Firebase App & Sync Script -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.4.0/firebase-app.js";
     import {
@@ -362,7 +432,6 @@
       { year: 2027, month: 0,  title: "January 2027",  days: 31 }
     ];
 
-    // Unique ID per person/browser so returning users edit their single submission
     const DEVICE_KEY = "bromas2k27_my_id";
     let myId = localStorage.getItem(DEVICE_KEY);
     if (!myId) {
@@ -370,7 +439,7 @@
       localStorage.setItem(DEVICE_KEY, myId);
     }
 
-    let allPeople = {}; // { docId: { name, emoji, dates } }
+    let allPeople = {};
     let myName = "";
     let myEmoji = EMOJIS[0];
     let myDates = [];
@@ -456,7 +525,6 @@
       });
     }
 
-    // Listen for live updates from everyone in Firestore
     onSnapshot(responsesCol, (snapshot) => {
       const fresh = {};
       snapshot.forEach((docSnap) => {
@@ -464,7 +532,6 @@
       });
       allPeople = fresh;
 
-      // On first load, if this device previously saved an entry, restore it for editing
       if (!initializedLocalFromCloud) {
         initializedLocalFromCloud = true;
         if (allPeople[myId]) {
@@ -484,7 +551,6 @@
     function render() {
       const trimmedName = nameInput.value.trim();
 
-      // Render Emoji Picker
       emojiPickerEl.innerHTML = "";
       EMOJIS.forEach((em) => {
         const btn = document.createElement("button");
@@ -504,7 +570,6 @@
         statusText.textContent = "Enter your name, pick an emoji, click your free days below, and hit Save Selections.";
       }
 
-      // Combine live cloud entries + your current unsaved edits
       const combinedPeople = { ...allPeople };
       if (trimmedName || myDates.length > 0) {
         combinedPeople[myId] = {
@@ -514,7 +579,6 @@
         };
       }
 
-      // Build map of date -> array of { name, emoji }
       const dateMap = {};
       const activePeople = Object.values(combinedPeople).filter(
         (p) => p && Array.isArray(p.dates) && p.dates.length > 0
@@ -530,7 +594,6 @@
         });
       });
 
-      // Render Calendars
       calendarsEl.innerHTML = "";
       MONTHS.forEach((m) => {
         const box = document.createElement("div");
@@ -587,7 +650,6 @@
         calendarsEl.appendChild(box);
       });
 
-      // Render Results
       totalPeopleEl.textContent = `${activePeople.length} ${activePeople.length === 1 ? "person" : "people"} responded`;
       resultsEl.innerHTML = "";
 
